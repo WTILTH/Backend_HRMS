@@ -5,23 +5,17 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table
-public class User {
+public class Salary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-
-    private String password;
+    private String role;
+    private Double baseSalary;
 
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Role role;
-
-    // Getters and Setters
 }

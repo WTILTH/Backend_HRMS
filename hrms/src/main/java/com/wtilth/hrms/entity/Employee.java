@@ -3,25 +3,24 @@ package com.wtilth.hrms.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+
 @Entity
 @Data
-@Table
-public class User {
+public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-
-    private String password;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String position;
+    private Double salary;
 
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Role role;
 
-    // Getters and Setters
 }
