@@ -14,5 +14,4 @@ public class DataSourceConfig {
     private String password;
     private String driverClassName;
 
-    // Getters and Setters
 }

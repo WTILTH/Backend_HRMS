@@ -10,7 +10,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -25,7 +24,7 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);  // Allow credentials (cookies, HTTP authentication)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration);  // Apply the CORS configuration to all paths
         return source;
     }
 
@@ -33,25 +32,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for JWT-based authentication
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()  // Public endpoints (signup, login, etc.)
-                        .requestMatchers("/actuator/**").permitAll()  // Public actuator endpoints
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/auth/**", "/actuator/**").permitAll()  // Public endpoints (signup, login, actuator)
                         .anyRequest().authenticated()  // Other requests require authentication
-                );
+                )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Apply CORS configuration
+                .csrf(AbstractHttpConfigurer::disable);  // Explicitly disable CSRF (for stateless APIs)
 
         return http.build();
     }
 
-    // CORS Filter to handle cross-origin requests
-    @Bean
-    public CorsFilter corsFilter() {
-        return new CorsFilter(corsConfigurationSource());
-    }
-
+    // Password Encoder Bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
-

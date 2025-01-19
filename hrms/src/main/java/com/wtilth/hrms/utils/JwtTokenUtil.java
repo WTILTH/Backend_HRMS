@@ -1,14 +1,23 @@
 package com.wtilth.hrms.utils;
 
+import com.wtilth.hrms.configuration.AppConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
 public class JwtTokenUtil {
 
-    private static final String SECRET_KEY = "your_secret_key"; // Change this to a strong secret
+    private static String secretKey;
+
+    @Autowired
+    public JwtTokenUtil(AppConfig appConfig) {
+        secretKey = appConfig.getSecretKey();
+    }
 
     public static String generateToken(String username, String role) {
         return Jwts.builder()
@@ -16,13 +25,14 @@ public class JwtTokenUtil {
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 
     public static Claims getClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+        return Jwts
+                .parser()
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -43,4 +53,3 @@ public class JwtTokenUtil {
         return (username.equals(getUsernameFromToken(token)) && !isTokenExpired(token));
     }
 }
-
